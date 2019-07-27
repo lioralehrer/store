@@ -15,27 +15,28 @@ class MySqlDBAdapter(BaseDatabaseAdapter):
                 cursor.execute(sql)
                 cursor.commit()
         except: Exception
-            # print(f"Exception occured when trying to add category {e}")
+            # print(f"Error :Exception occured when trying to add category {e}")
      
     def add_product(self, product):
         try:
             with self._connection.cursor() as cursor:
-                sql = f"INSERT INTO product VALUES('{product.id}','{product.category}','{product.description}','{product.price}','{product.title}','{product.favorite}','{product.img_url}')"
-                cursor.execute(sql)
+                sql = "INSERT INTO product VALUES('%s','%s','%s','%s','%s','%s','%s')"
+                cursor.execute(product.id,product.category,product.description,product.price,product.title,product.favorite,product.img_url)
                 cursor.commit()
         except: Exception 
             # print(f"Exception occured when trying to add category {e}")        
 
-    def get_category(self, category_id):
+    def  get_all_products_of_category(self, category_id):
         try:
             with self._connection.cursor()as cursor:
-                sql = f"select * from categories where id = '{category_id}'"
-                cursor.execute(sql)
+                sql = "select * from products where category = '%s'"
+                cursor.execute(sql,category_id)
                 return json.dumps(cursor.fetchone())
         except: Exception  
             # print(f"Exception occured when trying to get category {e}")        
 
     def get_all_categories(self):
+        print ("in db adapter")
         try:
             with self._connection.cursor()as cursor:
                 sql = "select * from categories"
