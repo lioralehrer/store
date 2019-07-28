@@ -2,6 +2,7 @@ from bottle import route, run, template, static_file, get, post, delete, request
 from sys import argv
 import json
 import pymysql
+import cgi
 connection = pymysql.connect(user='root', password='liora', db='store',
                              charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
 
@@ -37,17 +38,19 @@ def get_all_products_of_category(categoryID):
             result = {'STATUS': 'ERROR', 'MSG':"couldn't get the products from categories",'CODE':404}
             return result
 
-@post('categories')
+@post('/category')
 def add_category():
-      name = request.json.get("name")
+      name = request.forms.get("name")
+      print (name)
       try:
             with connection.cursor() as cursor:
-                  query = "insert into categories values %s"
-                  cursor.execute(query, (name))
-                  result = {'STATUS': 'SUCCESS', 'MSG': 'new category named: {name} added','CODE':200 }
+                  query = "insert into categories (name) values '%s'"
+                  cursor.execute(query,name)
                   connection.commit()
+                  result = {'STATUS': 'SUCCESS', 'MSG': 'new category named: {name} added','CODE':200 }
                   return json.dumps(result)
-      except:
+      except Exception as e:
+            print (e)
             result = {'STATUS': 'ERROR', 'MSG':"couldn't add category {name}",'CODE':500}
             return json.dumps(result)           
                   
@@ -77,6 +80,19 @@ def delete_category(category_id):
                   return result
       except: 
             result = {'STATUS': 'ERROR', 'MSG':"something went wrong with deleting the category with id {category_id}",'CODE':500}            
+@get('/products')
+def get_all_products():
+      try:
+            with connection.cursor()as cursor:
+                  query = 'select * from products'
+                  cursor.execute(query)
+                  result = {'PRODUCTS': cursor.fetchall(),'STATUS': 'SUCCESS', 'MSG':'get all the products','CODE':200}
+                  return json.dumps(result)
+      except Exception as e:
+            print (e)
+            result = {'STATUS': 'ERROR', 'MSG':"couldn't get the products ",'CODE':404}
+            return result
+
 @get('/products/<product_id')
 def get_product(product_id):
       try:
@@ -85,30 +101,32 @@ def get_product(product_id):
                   cursor.execute(query,(product_id))
                   result = {'PRODUCTS': cursor.fetchone(),'STATUS': 'SUCCESS', 'MSG':'get the product with id: {product_id}','CODE':200 }
                   return json.dumps(result)
-      except:
+      except Exception as e:
+            print (e)
             result = {'STATUS': 'ERROR', 'MSG':"couldn't get the product with id : {product_id}",'CODE':404}
             return result
             
-@post('/products')
+@post('/product')
 def add_prodact():
-      category = request.json.get("category")
-      description = request.json.get("description")
-      price = request.json.get("price")
-      title = request.json.get("title")
-      favorite = request.json.get("favorite")
-      img_url = request.json.get("img_url")
+      category = request.forms.get("category")
+      description = request.forms.get("description")
+      price = request.forms.get("price")
+      title = request.forms.get("title")
+      favorite = request.forms.get("favorite")
+      img_url = request.forms.get("img_url")
       try:
             with connection.cursor() as cursor:
-                  query = "insert into products values %s,%s,%s,%s,%s,%s"
+                  query = "insert into products (category, description,price,title,favorite,img_url)values %s,%s,%s,%s,%s,%s"
                   insert = (category ,description, price,title,favorite,img_url)
                   cursor.execute(query, insert)
                   result = {'STATUS': 'SUCCESS', 'MSG': 'new producted named: {title} added','CODE':200 }
                   connection.commit()
                   return json.dumps(result)
-      except:
-            result = {'STATUS': 'ERROR', 'MSG':"couldn't add product {title}",'CODE':500}
+      except Exception as e:
+            print (e)
+            result = {'STATUS': 'ERROR', 'MSG':"couldn't add product {title}",'CODE':405}
             return json.dumps(result) 
-@put('products')  
+@put('product')  
 def update_product():
       product_id = request.json.get("id")
       category = request.json.get("category")
