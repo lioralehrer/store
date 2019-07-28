@@ -44,7 +44,7 @@ def add_category():
       print (name)
       try:
             with connection.cursor() as cursor:
-                  query = "insert into categories (name) values '%s'"
+                  query = """insert into categories (name) values (%s)"""
                   cursor.execute(query,name)
                   connection.commit()
                   result = {'STATUS': 'SUCCESS', 'MSG': 'new category named: {name} added','CODE':200 }
@@ -116,7 +116,7 @@ def add_prodact():
       img_url = request.forms.get("img_url")
       try:
             with connection.cursor() as cursor:
-                  query = "insert into products (category, description,price,title,favorite,img_url)values %s,%s,%s,%s,%s,%s"
+                  query = "insert into products (category, description,price,title,favorite,img_url)values (%s,%s,%s,%s,%s,%s)"
                   insert = (category ,description, price,title,favorite,img_url)
                   cursor.execute(query, insert)
                   result = {'STATUS': 'SUCCESS', 'MSG': 'new producted named: {title} added','CODE':200 }

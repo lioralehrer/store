@@ -8,7 +8,7 @@ INSERT INTO categories VALUES (null,'novel');
 create table products(
 id int not null auto_increment primary key,
 category int not null,
-descroption varchar(100),
+description varchar(100),
 price float not null,
 title  varchar(30) not null,
 favorite int(5),
