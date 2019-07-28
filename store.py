@@ -109,7 +109,7 @@ def get_product(product_id):
 @post('/product')
 def add_prodact():
       category = request.forms.get("category")
-      description = request.forms.get("description")
+      description = request.forms.get("desc")
       price = request.forms.get("price")
       title = request.forms.get("title")
       img_url = request.forms.get("img_url")
