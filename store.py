@@ -22,17 +22,18 @@ def get_all_categories():
                   return json.dumps(result)
       except:
             result = {'STATUS': 'ERROR', 'MSG':"couldn't get the categories",'CODE':404}
-            return result             
+            return result                                  
         
 @get("/category/<categoryID>/products")
 def get_all_products_of_category(categoryID):
       try:
             with connection.cursor()as cursor:
-                  query = 'select * from products where category_id = %s'
+                  query = 'select * from products where category = %s'
                   cursor.execute(query,categoryID)
                   result = {'PRODUCTS': cursor.fetchall(),'STATUS': 'SUCCESS', 'MSG': 'all the products from category given','CODE':200 }
                   return json.dumps(result)
-      except:
+      except Exception as e:
+            print (e)
             result = {'STATUS': 'ERROR', 'MSG':"couldn't get the products from categories",'CODE':404}
             return result
 
@@ -76,19 +77,19 @@ def delete_category(category_id):
                   return result
       except: 
             result = {'STATUS': 'ERROR', 'MSG':"something went wrong with deleting the category with id {category_id}",'CODE':500}            
-@get('/product/<product_id')
+@get('/products/<product_id')
 def get_product(product_id):
       try:
             with connection.cursor()as cursor:
                   query = 'select * from products where id = %s'
                   cursor.execute(query,(product_id))
-                  result = {'CATEGORIES': cursor.fetchone(),'STATUS': 'SUCCESS', 'MSG':'get the product with id: {product_id}','CODE':200 }
+                  result = {'PRODUCTS': cursor.fetchone(),'STATUS': 'SUCCESS', 'MSG':'get the product with id: {product_id}','CODE':200 }
                   return json.dumps(result)
       except:
             result = {'STATUS': 'ERROR', 'MSG':"couldn't get the product with id : {product_id}",'CODE':404}
             return result
             
-@post('/product')
+@post('/products')
 def add_prodact():
       category = request.json.get("category")
       description = request.json.get("description")
@@ -107,7 +108,7 @@ def add_prodact():
       except:
             result = {'STATUS': 'ERROR', 'MSG':"couldn't add product {title}",'CODE':500}
             return json.dumps(result) 
-@put('product')  
+@put('products')  
 def update_product():
       product_id = request.json.get("id")
       category = request.json.get("category")
@@ -129,7 +130,7 @@ def update_product():
       except:
             result = {'STATUS': 'ERROR', 'MSG':"couldn't add product {title}",'CODE':500}
             return json.dumps(result)   
-@delete('product')
+@delete('products')
 def delete_product(product_id):
       try:
             with connection.cursor() as cursor:
