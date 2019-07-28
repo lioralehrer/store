@@ -112,11 +112,15 @@ def add_prodact():
       description = request.forms.get("description")
       price = request.forms.get("price")
       title = request.forms.get("title")
-      favorite = request.forms.get("favorite")
       img_url = request.forms.get("img_url")
+      favorite = request.forms.get("favorite")
+      if favorite == 'on':
+            favorite = 1
+      else:
+            favorite = 0      
       try:
             with connection.cursor() as cursor:
-                  query = "insert into products (category, description,price,title,favorite,img_url)values (%s,%s,%s,%s,%s,%s)"
+                  query = """insert into products (category, description,price,title,favorite,img_url)values (%s,%s,%s,%s,%s,%s)"""
                   insert = (category ,description, price,title,favorite,img_url)
                   cursor.execute(query, insert)
                   result = {'STATUS': 'SUCCESS', 'MSG': 'new producted named: {title} added','CODE':200 }
