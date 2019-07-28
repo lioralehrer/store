@@ -14,40 +14,131 @@ def index():
     return template("index.html")
 @get("/categories")
 def get_all_categories():
-      with connection.cursor()as cursor:
-            query = 'select * from categories'
-            cursor.execute(query)
-            result = {'CATEGORIES': cursor.fetchall(),'STATUS': 'SUCCESS', 'MSG':'all the categories given','CODE':200 }
-            return json.dumps(result)
+      try:
+            with connection.cursor()as cursor:
+                  query = 'select * from categories'
+                  cursor.execute(query)
+                  result = {'CATEGORIES': cursor.fetchall(),'STATUS': 'SUCCESS', 'MSG':'all the categories given','CODE':200 }
+                  return json.dumps(result)
+      except:
+            result = {'STATUS': 'ERROR', 'MSG':"couldn't get the categories",'CODE':404}
+            return result             
         
 @get("/category/<categoryID>/products")
 def get_all_products_of_category(categoryID):
-      with connection.cursor()as cursor:
-            query = 'select * from products where category_id = %s'
-            cursor.execute(query,categoryID)
-            result = {'PRODUCTS': cursor.fetchall(),'STATUS': 'SUCCESS', 'MSG': 'all the products from category given','CODE':200 }
-            return json.dumps(result)
+      try:
+            with connection.cursor()as cursor:
+                  query = 'select * from products where category_id = %s'
+                  cursor.execute(query,categoryID)
+                  result = {'PRODUCTS': cursor.fetchall(),'STATUS': 'SUCCESS', 'MSG': 'all the products from category given','CODE':200 }
+                  return json.dumps(result)
+      except:
+            result = {'STATUS': 'ERROR', 'MSG':"couldn't get the products from categories",'CODE':404}
+            return result
+
 @post('categories')
-def update_category():
-      pass            
+def add_category():
+      name = request.json.get("name")
+      try:
+            with connection.cursor() as cursor:
+                  query = "insert into categories values %s"
+                  cursor.execute(query, (name))
+                  result = {'STATUS': 'SUCCESS', 'MSG': 'new category named: {name} added','CODE':200 }
+                  connection.commit()
+                  return json.dumps(result)
+      except:
+            result = {'STATUS': 'ERROR', 'MSG':"couldn't add category {name}",'CODE':500}
+            return json.dumps(result)           
+                  
 @put('categories')  
 def update_category(category_id, category_to_update):
-      pass 
+      name = request.json.get("name")
+      category_id = request.json.get("id")
+      try:
+            with connection.cursor() as cursor:
+                  query = "select * from categories where id = %s"
+                  cursor.execute(query, category_id)
+                  old_name= json.dumps(cursor.fetchone())
+                  query = "UPDATE students SET name= %s WHERE id = %s"
+                  cursor.execute(query,category_id)
+                  result = {'STATUS': 'SUCCESS', 'MSG': 'new producted named: {title} have been changed','CODE':200 }
+                  connection.commit()
+      except:
+            result = {'STATUS': 'ERROR', 'MSG':"couldn't add product {title}",'CODE':500}
+            return json.dumps(result)
 @delete('categories')
 def delete_category(category_id):
-      pass
+      try:
+            with connection.cursor() as cursor:
+                  query = "delete from categories  where id = %s"
+                  cursor.execute(query, (category_id))
+                  result = {'STATUS': 'SUCCESS', 'MSG':"delete category with id {category_id} from repository",'CODE':200}
+                  return result
+      except: 
+            result = {'STATUS': 'ERROR', 'MSG':"something went wrong with deleting the category with id {category_id}",'CODE':500}            
 @get('/product/<product_id')
 def get_product(product_id):
-      pass      
+      try:
+            with connection.cursor()as cursor:
+                  query = 'select * from products where id = %s'
+                  cursor.execute(query,(product_id))
+                  result = {'CATEGORIES': cursor.fetchone(),'STATUS': 'SUCCESS', 'MSG':'get the product with id: {product_id}','CODE':200 }
+                  return json.dumps(result)
+      except:
+            result = {'STATUS': 'ERROR', 'MSG':"couldn't get the product with id : {product_id}",'CODE':404}
+            return result
+            
 @post('/product')
 def add_prodact():
-      pass
+      category = request.json.get("category")
+      description = request.json.get("description")
+      price = request.json.get("price")
+      title = request.json.get("title")
+      favorite = request.json.get("favorite")
+      img_url = request.json.get("img_url")
+      try:
+            with connection.cursor() as cursor:
+                  query = "insert into products values %s,%s,%s,%s,%s,%s"
+                  insert = (category ,description, price,title,favorite,img_url)
+                  cursor.execute(query, insert)
+                  result = {'STATUS': 'SUCCESS', 'MSG': 'new producted named: {title} added','CODE':200 }
+                  connection.commit()
+                  return json.dumps(result)
+      except:
+            result = {'STATUS': 'ERROR', 'MSG':"couldn't add product {title}",'CODE':500}
+            return json.dumps(result) 
 @put('product')  
-def update_product(product_id, product_to_update):
-      pass 
+def update_product():
+      product_id = request.json.get("id")
+      category = request.json.get("category")
+      description = request.json.get("description")
+      price = request.json.get("price")
+      title = request.json.get("title")
+      favorite = request.json.get("favorite")
+      img_url = request.json.get("img_url")
+      try:
+        with connection.cursor() as cursor:
+            query = "select * from products where id= %s"
+            cursor.execute(query, product_id)
+            old_name= json.dumps(cursor.fetchone())
+            query = "UPDATE products SET category= %s,description=%s,price=%s,title=%s,favorite = %s,img_url = %s WHERE studentId = %s"
+            insert = (category ,description, price,title,favorite,img_url)
+            cursor.execute(query,insert)
+            result = {'STATUS': 'SUCCESS', 'MSG': 'new producted named: {title} have been changed','CODE':200 }
+            connection.commit()
+      except:
+            result = {'STATUS': 'ERROR', 'MSG':"couldn't add product {title}",'CODE':500}
+            return json.dumps(result)   
 @delete('product')
 def delete_product(product_id):
-      pass      
+      try:
+            with connection.cursor() as cursor:
+                  query = "delete from products  where id = %s"
+                  cursor.execute(query, (product_id))
+                  result = {'STATUS': 'SUCCESS', 'MSG':"delete product with id {product_id} from repository",'CODE':200}
+                  return result
+      except: 
+            result = {'STATUS': 'ERROR', 'MSG':"something went wrong with deleting the product with id {product_id}",'CODE':500}      
 @get('/js/<filename:re:.*\.js>')
 def javascripts(filename):
     return static_file(filename, root='js')
