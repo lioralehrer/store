@@ -121,7 +121,7 @@ def add_prodact():
       try:
             with connection.cursor() as cursor:
                   query = """insert into products (category, description,price,title,favorite,img_url)values (%s,%s,%s,%s,%s,%s)"""
-                  insert = (category ,description, price,title,favorite,img_url)
+                  insert = (category ,description, price,title,favorite,"../images/"+img_url)
                   cursor.execute(query, insert)
                   result = {'STATUS': 'SUCCESS', 'MSG': 'new producted named: {title} added','CODE':200 }
                   connection.commit()
